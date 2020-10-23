@@ -8,13 +8,15 @@ import java.util.Arrays;
 public class Mastermind {
 	Random rand=new Random();
 	
-	private int code_length;
-	private int max_moves;
-	private int max_number;
-	private boolean duplicates;
+	private int code_length; 		// amount of digits in a code, usually between 4 and 8
+	private int max_moves;   		// amount of moves (guesses) player has before he loses
+	private int max_number;  		// range of digits in a code, from 1 to max_number
+	private boolean duplicates; 	// are duplicated digits in a code allowed
 	
-	private int current_move=1;
-	private int[] correct_code;
+	private int current_move=1;		// index for moves, if it reaches max_moves player loses
+	private int[] correct_code;		// array that holds the digits of a correct code
+	
+	private Timer t1;
 	
 	public Mastermind(int code_length, int max_moves, int max_number, boolean duplicates) {
 		this.code_length=code_length;
@@ -22,31 +24,28 @@ public class Mastermind {
 		this.max_number=max_number;
 		this.duplicates=duplicates;
 		correct_code=new int[code_length];
+		
+		t1 = new Timer();
+    	t1.start();
+		
 		Create_code();
 		Play();
 	}
 	
-	public void Create_code()
+	public void Create_code()		// generate the correct code by random
 	{
 		for(int i=0;i<code_length;i++)
 		{
 		    int random=rand.nextInt(max_number)+1;
-			while(!duplicates && Check_duplicates(random,i))
+			while(!duplicates && Check_duplicates(random,i))  // if the duplicates are turned off, we have to change digits that are already in the code
 			{
 				random=rand.nextInt(max_number)+1;
 			}
 			correct_code[i]=random;
 		}
-		
-		
-		//show code
-		/*for(int i=0;i<code_length;i++)
-		{
-			System.out.print(correct_code[i]);
-		}*/
 	}
 	
-	public void Play()
+	public void Play()		// main method, where the player makes his moves
 	{
 		System.out.println("\nI have generated a " + code_length +" digits long code, consisting of numbers from 1 to " + max_number +".");
 		if(duplicates) System.out.println("Duplicates are allowed.");
@@ -55,40 +54,43 @@ public class Mastermind {
 		
 		Scanner input=new Scanner(System.in);
 		
-		while(current_move<=max_moves)
+		while(current_move<=max_moves)		// main loop, where the game takes place
 		{
-			System.out.print("\nMove #" + current_move +": ");
+			System.out.print("\nMove #" + current_move + ": ");
 			String move=input.nextLine();
-			while(!Is_correct(move))
+			while(!Is_correct(move))		// if the move is incorrect, the player has to type it again
 			{
 				System.out.println("Error. Incorrect move");
 				move=input.nextLine();
 			}
-			if(Is_won(move))
+			if(Is_won(move))				// if the code is fully correct, the game is won
 			{
 				Game_won();
 				break;
 			}
 			else
 			{
-				Check_move(move);
+				Check_move(move);			// compare the player code to the winning code
 				current_move++;
 			}
 		}
-		if(current_move>max_moves) Game_lost();
+		if(current_move>max_moves)	Game_lost();		// if the player used all his moves and didn't guess the code, the game is lost
 	}
 	
-	public void Game_won()
+	public boolean Is_correct(String move) // checks if the code that player typed is correct
 	{
-		System.out.println("\nCongratulations! You have won in " + current_move + " moves. The code was: " + Arrays.toString(correct_code));
+		if(move.length()!=code_length) return false; // the winning code, and player typed code have to be equal in length
+		for(int i=0;i<move.length();i++)			 // digits in the code have to be between 1 and max_number
+		{
+			if(Character.getNumericValue(move.charAt(i))<1 || Character.getNumericValue(move.charAt(i))>max_number)
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 	
-	public void Game_lost()
-	{
-		System.out.println("\nYou lost, correct code was: " + Arrays.toString(correct_code));
-	}
-	
-	public void Check_move(String move)
+	public void Check_move(String move) // this method returns the amount of perfect digits (in the right place) and wrongly placed digits (they are in code, but in different place)
 	{
 		int perfect=0;
 		int wrong_place=0;
@@ -109,7 +111,7 @@ public class Mastermind {
 		System.out.println("Perfect: " + perfect + " Wrong place: " + wrong_place);
 	}
 	
-	public boolean Check_duplicates_move(String move, int l)
+	public boolean Check_duplicates_move(String move, int l)   // this method supplements the Check_move(String move) method so that it gives the correct answers
 	{
 		for(int i=0;i<l;i++)
 		{
@@ -121,11 +123,10 @@ public class Mastermind {
 		return false;
 	}
 	
-	public boolean Is_won(String move)
+	public boolean Is_won(String move)	//simple method, that checks if the code typed by the player equals winning code
 	{
 		for(int i=0;i<code_length;i++)
 		{
-			//if(correct_code[i]!=move.charAt(i)-48)
 			if(correct_code[i]!=Character.getNumericValue(move.charAt(i)))
 			{
 				return false;
@@ -134,21 +135,29 @@ public class Mastermind {
 		return true;
 	}
 	
-	public boolean Is_correct(String move)
+	public void Game_won()		// game results
 	{
-		if(move.length()!=code_length) return false;
-		for(int i=0;i<move.length();i++)
-		{
-			//if(move.charAt(i)<49 || move.charAt(i)>(49+max_number-1))
-			if(Character.getNumericValue(move.charAt(i))<1 || Character.getNumericValue(move.charAt(i))>max_number)
-			{
-				return false;
-			}
-		}
-		return true;
+		System.out.println("\nCongratulations! You have won in " + current_move + " moves. The code was: " + Correct_code_to_string());
+		t1.Display_time();
 	}
 	
-	public boolean Check_duplicates(int number, int l)
+	public void Game_lost()		// game results
+	{
+		System.out.println("\nYou lost, correct code was: " + Correct_code_to_string());
+		t1.Display_time();
+	}
+	
+	public String Correct_code_to_string() // change code from array of ints to string
+	{
+		String code="";
+		for(int i=0;i<code_length;i++)
+		{
+			code+=Integer.toString(correct_code[i]);
+		}
+		return code;
+	}
+	
+	public boolean Check_duplicates(int number, int l) // used if dupplicates are not allowed
 	{
 		for(int i=0; i<=l; i++)
 		{

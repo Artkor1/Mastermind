@@ -29,20 +29,15 @@ import javafx.scene.text.Font;
 
 //TODO
 //komentarze do programu zaktualizowac
-//pousuwac zbedne komentarze
-//nowe okno przy wygranej/przegranej
-//lepsze kolorki dobrac - te raza w oczy
 //mastermind to klasa wewnetrzna i nie potrzebuje przekazania zmiennych
 
 
 
-
-//public class Menu extends Application implements EventHandler<ActionEvent> {
 public class Menu extends Application{
 	
 	Stage window;
 	Scene main_scene, tutorial_scene, game_scene;
-	VBox main_menu, tutorial; //game;
+	VBox main_menu, tutorial, game_menu; //game;
 	GridPane game_grid;
 	GridPane[] results_grid;
 	ScrollPane game_pane;
@@ -50,7 +45,10 @@ public class Menu extends Application{
 	Button[] game_choices;
 	Button tut1, game_exit, game_cancel, game_again;
 	Label tut2, game_timer, game_over;
-	Label[] game_answers, game_correct, game_results;
+	Label[] game_answers, game_correct, game_results, game_numbers;
+	
+	
+	public static Button test_button;
 	
 	Timer t1;
 	
@@ -102,9 +100,15 @@ public class Menu extends Application{
                      "-fx-border-color: black;");
 			main_scene = new Scene(main_menu,620,400);
 			
+			test_button=new Button("test");
+			main_menu.getChildren().add(test_button);
+			
+			
 			menu_buttons[0].setOnAction(e ->
 			{
 				window.setScene(game_scene);
+				//Test test_class=new Test();
+				//test_class.Change();
 				Mastermind game = new Mastermind(code_length, max_moves, max_number, duplicates);
 			});
 			//menu_buttons[1].setOnAction(this);
@@ -120,12 +124,12 @@ public class Menu extends Application{
 			tut1 = new Button("Go back");
 			tut1.setFont(new Font(25.0));
 			tut1.setPrefSize(400, 60);
-			//TODO change numbers to colors
-			tut2 = new Label("The game of Mastermind is a simple (yet intriguing) game of logic. The computer generates a " + code_length + 
-					"-digit long code, consisting of numbers from 1 to " + max_number + ". Your role is to crack that code.\nYou have " + max_moves  + 
-					" moves. On each move, you try to guess the correct code by typing your own " + code_length + "-digit long code. " + 
-					"Each time you do it, You get the information about how many digits are in the right place, and how many are in the code but in the wrong place. " + 
-					"By analyzing these results, excluding the incorrect numbers and confirming the place of correct numbers, you can crack the code!" + 
+			tut2 = new Label("The game of Mastermind is a simple (yet intriguing) game of logic. The computer generates a code consisting of " + code_length +
+					" colors. \nYour role is to crack that code. You have " + max_moves  + 
+					" moves. On each move, you try to guess the correct code by choosing " + code_length + " colors." + 
+					"\nSmall circles on the right represent the results of your guess."+
+					" Each red circle represents a single color in the right place and each yellow circle represents a color in code, but in a different place." + 
+					"\nBy analyzing these results, excluding the incorrect colors and confirming the place of correct colors, you can crack the code!" + 
 					"\nRemember: Your time and moves are being counted!");
 			tut2.setWrapText(true);
 			
@@ -165,26 +169,26 @@ public class Menu extends Application{
 			
 			game_choices[0].setStyle("-fx-background-color: red;" +
 					"    -fx-cursor: hand;");
-			game_choices[1].setStyle("-fx-background-color: blue;" +
+			game_choices[1].setStyle("-fx-background-color: royalblue;" +
 					"    -fx-cursor: hand;");
 			game_choices[2].setStyle("-fx-background-color: lime;" +
 					"    -fx-cursor: hand;");
-			game_choices[3].setStyle("-fx-background-color: yellow;" +
+			game_choices[3].setStyle("-fx-background-color: gold;" +
 					"    -fx-cursor: hand;");
-			game_choices[4].setStyle("-fx-background-color: purple;" +
+			game_choices[4].setStyle("-fx-background-color: blueviolet;" +
 					"    -fx-cursor: hand;");
 			game_choices[5].setStyle("-fx-background-color: black;" +
 					"    -fx-cursor: hand;");
 			game_choices[6].setStyle("-fx-background-color: darkgreen;" +
 					"    -fx-cursor: hand;");
-			game_choices[7].setStyle("-fx-background-color: brown;" +
+			game_choices[7].setStyle("-fx-background-color: sienna;" +
 					"    -fx-cursor: hand;");
 			
 			
 			game_answers = new Label[(max_moves*code_length)];
 			game_results = new Label[(max_moves*code_length)];
 			game_correct = new Label[code_length];
-			
+			game_numbers = new Label[max_moves];
 			for(int i=0;i<(max_moves*code_length);i++)
 			{
 				
@@ -197,7 +201,8 @@ public class Menu extends Application{
 				game_results[i] = new Label();
 				game_results[i].setPrefSize(15,15);
 				game_results[i].setShape(new Circle(1));
-				//game_results[i].setStyle("-fx-background-color: grey");
+				game_results[i].setStyle("-fx-background-color: lightgray");
+				game_results[i].setVisible(false);
 			}
 			
 			for(int i=0;i<code_length;i++)
@@ -210,6 +215,12 @@ public class Menu extends Application{
 				game_correct[i].setFont(new Font(20.0));
 			}
 			
+			for(int i=0;i<max_moves;i++)
+			{
+				game_numbers[i] = new Label(Integer.toString(i+1));
+			}
+			
+			
 
 			game_grid = new GridPane();
 			game_grid.setHgap(5);
@@ -218,7 +229,7 @@ public class Menu extends Application{
 			Line line1 = new Line(330, 0, 330, 460);
 			Line line2 = new Line(0, 50, 340, 50);
 			Line line3 = new Line(0, 50, 340, 50);
-			game_grid.add(line1, 4, 0, 1, 27);
+			game_grid.add(line1, 5, 0, 1, 27);
 			game_grid.add(line2, 0, 2, 9, 1);
 			game_grid.add(line3, 0, 26, 9, 1);
 			
@@ -235,34 +246,38 @@ public class Menu extends Application{
 			Pane spring2 = new Pane();
 			Pane spring3 = new Pane();
 			Pane spring4 = new Pane();
-			spring1.setMinWidth(20);
+			spring1.setMinWidth(10);
 			spring2.setMinWidth(20);
 			spring3.setMinHeight(10);
 			spring4.setMinHeight(10);
-			game_grid.add(spring1, 5, 0, 1, 2);
+			game_grid.add(spring1, 6, 0, 1, 2);
 			game_grid.add(spring2, 0, 3, 9, 2);
 			game_grid.add(spring3, 0, 27, 9, 1);
 			game_grid.add(spring4, 0, 29, 9, 1);
 			
 			
-			game_grid.add(game_timer, 6, 0);
-			game_grid.add(game_cancel, 6, 1);
+			game_grid.add(game_timer, 7, 0);
+			game_grid.add(game_cancel, 7, 1);
 			
 
 			for(int i=0; i<max_number; i++)
 			{
-				game_grid.add(game_choices[i], i%code_length, i/code_length);
+				game_grid.add(game_choices[i], i%code_length+1, i/code_length);
+			}
+			
+			for(int i=0;i<max_moves;i++)
+			{
+				game_grid.add(game_numbers[i], 0 , 5+i*2);
 			}
 			
 			for(int i=0;i<(max_moves*code_length);i++)
 			{
-				game_grid.add(game_answers[i], i%code_length, 5+(i/code_length*2));
-				
+				game_grid.add(game_answers[i], i%code_length+1, 5+(i/code_length*2));
 			}
 			
 			for(int i=0;i<code_length;i++)
 			{
-				game_grid.add(game_correct[i], i%code_length, 28);
+				game_grid.add(game_correct[i], i%code_length+1, 28);
 			}
 			
 			results_grid = new GridPane[max_moves];
@@ -275,35 +290,32 @@ public class Menu extends Application{
 				results_grid[i].add(game_results[i*code_length+1], 1, 0);
 				results_grid[i].add(game_results[i*code_length+2], 0, 1);
 				results_grid[i].add(game_results[i*code_length+3], 1, 1);
-				game_grid.add(results_grid[i], 6, 5+i*2);
+				game_grid.add(results_grid[i], 7, 5+i*2);
 			}
 			
-			game_grid.add(game_over, 6, 28);
-			game_grid.add(game_exit, 0, 30, 2, 1);
-			game_grid.add(game_again, 6, 30);
+			game_grid.add(game_over, 7, 28);
+			game_grid.add(game_exit, 1, 30, 2, 1);
+			game_grid.add(game_again, 7, 30);
+			
+			//game_grid.setStyle("-fx-background-color: white");
 			
 			
-		    /*game_pane = new ScrollPane(game_grid);
-		    game_pane.setStyle("-fx-padding: 10;" + 
-	                "-fx-border-style: solid inside;" + 
-	                "-fx-border-width: 2;" +
-	                "-fx-border-insets: 5;" + 
-	                "-fx-border-radius: 5;" + 
-	                "-fx-border-color: black;");
-		    game_scene = new Scene(game_pane, 590, 400);*/
-			game_grid.setStyle("-fx-padding: 10;" + 
-	                "-fx-border-style: solid inside;" + 
-	                "-fx-border-width: 2;" +
-	                "-fx-border-insets: 5;" + 
-	                "-fx-border-radius: 5;" + 
-	                "-fx-border-color: black;");
-			game_scene = new Scene(game_grid, 620, 400);
-			game_grid.setStyle("-fx-background-color: white");
+			
+			game_menu = new VBox();
+			game_menu.getChildren().add(game_grid);
+			game_menu.setStyle("-fx-padding: 10;" + 
+                     "-fx-border-style: solid inside;" + 
+                     "-fx-border-width: 2;" +
+                     "-fx-border-insets: 5;" + 
+                     "-fx-border-radius: 5;" + 
+                     "-fx-border-color: black;");
+			
+			game_scene = new Scene(game_menu, 620, 400);
+			
 			//scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			
 			
 			window.setScene(main_scene);
-			//window.setScene(game_scene);
 			window.show();
 			
 		} catch(Exception e) {
@@ -326,6 +338,8 @@ public class Menu extends Application{
 		private int[] current_code;
 		private int[] correct_code;		// array that holds the digits of a correct code
 		
+		private boolean is_over;
+		
 		
 		
 		public Mastermind(int code_length, int max_moves, int max_number, boolean duplicates) {
@@ -335,19 +349,19 @@ public class Menu extends Application{
 			this.duplicates=duplicates;
 			correct_code=new int[code_length];
 			current_code=new int[code_length];
+			is_over=false;
 			
 			t1 = new Timer();
 	    	t1.start();
 
 			Create_code();
-	    	Display_code();
 	    	
 	    	game_exit.setOnAction(e -> 		//exit button
 			{
 				for(int i=0;i<(max_moves*code_length);i++)
 				{
 					game_answers[i].setStyle("-fx-background-color: lightgray");
-					game_results[i].setStyle("-fx-background-color: white");
+					game_results[i].setVisible(false);
 				}
 				for(int i=0; i<code_length;i++)
 	    		{
@@ -364,10 +378,11 @@ public class Menu extends Application{
 	    	
 	    	game_again.setOnAction(e ->
 	    	{
+	    		is_over=false;
 	    		for(int i=0;i<(max_moves*code_length);i++)
 				{
 					game_answers[i].setStyle("-fx-background-color: lightgray");
-					game_results[i].setStyle("-fx-background-color: white");
+					game_results[i].setVisible(false);
 				}
 	    		for(int i=0; i<code_length;i++)
 	    		{
@@ -381,14 +396,13 @@ public class Menu extends Application{
 	    		game_over.setVisible(false);
 	    		if(t1!=null)
 	    		{
-	    			t1.Terminate();
 	    			t1.Start_again();
 	    		}
 	    		
 	    	});
 	    	game_cancel.setOnAction(e ->
 	    	{
-	    		if(current_element>0 && (current_move-1)*code_length+current_element < max_moves*code_length)
+	    		if(current_element>0 && (current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
 	    		{
 	    			current_element--;
 	    			current_code[current_element]=0;
@@ -398,7 +412,7 @@ public class Menu extends Application{
 	    	
 	    	game_choices[0].setOnAction(e ->
 	    	{
-	    		if((current_move-1)*code_length+current_element < max_moves*code_length)
+	    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
 	    		{
 	    			current_code[current_element]=1;
 		    		game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:red");
@@ -408,10 +422,10 @@ public class Menu extends Application{
 	    	});
 	    	game_choices[1].setOnAction(e ->
 	    	{
-	    		if((current_move-1)*code_length+current_element < max_moves*code_length)
+	    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
 	    		{
 	    			current_code[current_element]=2;
-		    		game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:blue");
+		    		game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:royalblue");
 		    		if(Is_finished()) Play();
 		    		else current_element++;
 	    		}
@@ -419,7 +433,7 @@ public class Menu extends Application{
 	    	});
 	    	game_choices[2].setOnAction(e ->
 	    	{
-	    		if((current_move-1)*code_length+current_element < max_moves*code_length)
+	    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
 	    		{
 	    			current_code[current_element]=3;
 		    		game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:lime");
@@ -429,27 +443,27 @@ public class Menu extends Application{
 	    	});
 	    	game_choices[3].setOnAction(e ->
 	    	{
-	    		if((current_move-1)*code_length+current_element < max_moves*code_length)
+	    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
 	    		{
 	    			current_code[current_element]=4;
-		    		game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:yellow");
+		    		game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:gold");
 		    		if(Is_finished()) Play();
 		    		else current_element++;
 	    		}
 	    	});
 	    	game_choices[4].setOnAction(e ->
 	    	{
-	    		if((current_move-1)*code_length+current_element < max_moves*code_length)
+	    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
 	    		{
 	    			current_code[current_element]=5;
-		    		game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:purple");
+		    		game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:blueviolet");
 		    		if(Is_finished()) Play();
 		    		else current_element++;
 	    		}
 	    	});
 	    	game_choices[5].setOnAction(e ->
 	    	{
-	    		if((current_move-1)*code_length+current_element < max_moves*code_length)
+	    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
 	    		{
 	    			current_code[current_element]=6;
 		    		game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:black");
@@ -459,7 +473,7 @@ public class Menu extends Application{
 	    	});
 	    	game_choices[6].setOnAction(e ->
 	    	{
-	    		if((current_move-1)*code_length+current_element < max_moves*code_length)
+	    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
 	    		{
 	    			current_code[current_element]=7;
 		    		game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:darkgreen");
@@ -469,10 +483,10 @@ public class Menu extends Application{
 	    	});
 	    	game_choices[7].setOnAction(e ->
 	    	{
-	    		if((current_move-1)*code_length+current_element < max_moves*code_length)
+	    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
 	    		{
 	    			current_code[current_element]=8;
-		    		game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:brown");
+		    		game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color: sienna");
 		    		if(Is_finished()) Play();
 		    		else current_element++;
 	    		}
@@ -506,14 +520,14 @@ public class Menu extends Application{
 		{
 			if(Is_won())				// if the code is fully correct, the game is won
 			{
-				Game_won();
+				Game_over(true);
 			}
 			else
 			{
 				Check_move();			// compare the player code to the winning code
 				current_move++;
 			}
-			if(current_move>max_moves)	Game_lost();		// if the player used all his moves and didn't guess the code, the game is lost
+			if(current_move>max_moves)	Game_over(false);		// if the player used all his moves and didn't guess the code, the game is lost
 			current_element=0;
 			for(int i=0;i<code_length;i++)
 			{
@@ -558,30 +572,7 @@ public class Menu extends Application{
 					}
 				}
 			}
-			/*for(int i=0;i<code_length;i++)
-			{
-				if(!Check_duplicates_move(i))
-				{
-					for(int j=0;j<code_length;j++)
-					{
-						if(current_code[i] == correct_code[j])
-						{
-							if(i==j)
-							{
-								perfect++;
-								support[i]=2;
-							}
-							else
-							{
-								wrong_place++;
-								support[i]=1;
-							}
-						}
-					}
-				}
-			}*/
 			Results_move(perfect,wrong_place);
-			System.out.println("Perfect: " + perfect + " Wrong place: " + wrong_place);
 		}
 		
 		public boolean Check_duplicates_move(int l)   // this method supplements the Check_move(String move) method so that it gives the correct answers
@@ -604,14 +595,20 @@ public class Menu extends Application{
 				if(perfect>0)
 				{
 					game_results[i+(current_move-1)*code_length].setStyle("-fx-background-color:red");
+					game_results[i+(current_move-1)*code_length].setVisible(true);
 					perfect--;
 				}
 				else if(wrong_place>0)
 				{
-					game_results[i+(current_move-1)*code_length].setStyle("-fx-background-color:yellow");
+					game_results[i+(current_move-1)*code_length].setStyle("-fx-background-color:gold");
+					game_results[i+(current_move-1)*code_length].setVisible(true);
 					wrong_place--;
 				}
-				else	game_results[i+(current_move-1)*code_length].setStyle("-fx-background-color:lightgray");
+				else	
+				{
+					game_results[i+(current_move-1)*code_length].setStyle("-fx-background-color:lightgray");
+					game_results[i+(current_move-1)*code_length].setVisible(true);
+				}
 			}
 		}
 		
@@ -627,43 +624,71 @@ public class Menu extends Application{
 			return true;
 		}
 		
-		public void Game_won()		// game results
-		{
-			Results_move(4,0);
-			game_over.setText("You won!");
-			Game_over();
-			
-			System.out.println("\nCongratulations! You have won in " + current_move + " moves. The code was: ");
-			Display_code();
-			t1.Display_time();
-		}
 		
-		public void Game_over()
+		public void Game_over(boolean win)
 		{
+			is_over=true;
 			game_over.setVisible(true);
+			if(t1!=null)
+    		{
+				t1.Terminate();
+    		}
+			
 			for(int i=0;i<code_length;i++)
 			{
 				game_correct[i].setText("");
 				if(correct_code[i]==1)	game_correct[i].setStyle("-fx-background-color:red");
-				else if(correct_code[i]==2)	game_correct[i].setStyle("-fx-background-color:blue");
+				else if(correct_code[i]==2)	game_correct[i].setStyle("-fx-background-color:royalblue");
 				else if(correct_code[i]==3)	game_correct[i].setStyle("-fx-background-color:lime");
-				else if(correct_code[i]==4)	game_correct[i].setStyle("-fx-background-color:yellow");
-				else if(correct_code[i]==5)	game_correct[i].setStyle("-fx-background-color:purple");
+				else if(correct_code[i]==4)	game_correct[i].setStyle("-fx-background-color:gold");
+				else if(correct_code[i]==5)	game_correct[i].setStyle("-fx-background-color:blueviolet");
 				else if(correct_code[i]==6)	game_correct[i].setStyle("-fx-background-color:black");
 				else if(correct_code[i]==7)	game_correct[i].setStyle("-fx-background-color:darkgreen");
-				else if(correct_code[i]==8)	game_correct[i].setStyle("-fx-background-color:brown");
+				else if(correct_code[i]==8)	game_correct[i].setStyle("-fx-background-color:sienna");
+			}
+			
+			for(int i=0;i<max_moves*code_length;i++)
+			{
+				game_results[i].setVisible(false);
+			}
+			
+			
+			Stage game_over_stage = new Stage();
+			game_over_stage.setWidth(200);
+			game_over_stage.setHeight(200);
+			game_over_stage.setResizable(false);
+			
+			Label game_over_label = new Label();
+			game_over_label.setFont(new Font(15.0));
+			Button game_over_button = new Button("Close");
+			game_over_button.setFont(new Font(15.0));
+			game_over_button.setOnAction(e -> game_over_stage.close());
+			VBox game_over_layout = new VBox(10);
+			game_over_layout.getChildren().addAll(game_over_label,game_over_button);
+			Scene game_over_scene = new Scene(game_over_layout);
+			game_over_stage.setScene(game_over_scene);
+			game_over_stage.show();
+			game_over_layout.setStyle("-fx-padding: 10;" + 
+                    "-fx-border-style: solid inside;" + 
+                    "-fx-border-width: 2;" +
+                    "-fx-border-insets: 5;" + 
+                    "-fx-border-radius: 5;" + 
+                    "-fx-border-color: black;");
+			
+			if(win)
+			{
+				Results_move(4,0);
+				game_over_label.setText("You won!\nMoves: " + (current_move) + "/" +max_moves +"\n" + t1.Display_time());
+				game_over.setText("You won!");
+			}
+			else
+			{
+				game_over_label.setText("You lost!\nMoves: " + (current_move-1) + "/" +max_moves +"\n" + t1.Display_time());
+				game_over.setText("You lost!");
 			}
 		}
 		
-		public void Game_lost()		// game results
-		{
-			game_over.setText("You lost!");
-			Game_over();
-			//game_over.setVisible(true);
-			System.out.println("\nYou lost, correct code was: ");
-			Display_code();
-			t1.Display_time();
-		}
+
 		
 		public boolean Check_duplicates(int number, int l) // used if dupplicates are not allowed
 		{
@@ -673,14 +698,6 @@ public class Menu extends Application{
 			}
 			return false;
 		}
-		public void Display_code()
-		{
-			for(int i=0;i<code_length;i++)
-			{
-				System.out.println(correct_code[i]);
-			}
-		}
-		
 	}
 	
 	public class Timer extends Thread {
@@ -704,29 +721,32 @@ public class Menu extends Application{
 		{
 			try
 			{
-				while(running)
+				while(true)
 				{
-					seconds++;
-					if(seconds>=60)
+					if(running)
 					{
-						seconds=0;
-						minutes++;
-						if(minutes>=60)
+						seconds++;
+						if(seconds>=60)
 						{
-							minutes=0;
-							hours++;
+							seconds=0;
+							minutes++;
+							if(minutes>=60)
+							{
+								minutes=0;
+								hours++;
+							}
 						}
+						Platform.runLater(new Runnable() {
+				            public void run() {
+				            	game_timer.setText(Display_time());
+				            }
+				        });
+						TimeUnit.SECONDS.sleep(1);
 					}
-					Platform.runLater(new Runnable() {
-			            public void run() {
-			            	game_timer.setText(Display_time());
-			            }
-			        });
-					TimeUnit.SECONDS.sleep(1);
 				}
-				seconds=0;
-				minutes=0;
-				hours=0;
+				//seconds=0;
+				//minutes=0;
+				//hours=0;
 			}
 			catch (Exception e)
 			{

@@ -1,9 +1,13 @@
 package application;
 
 import java.util.Random;
-import java.util.Scanner;
-import java.util.Arrays;
 
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
 public class Mastermind {
 	Random rand=new Random();
@@ -14,9 +18,158 @@ public class Mastermind {
 	private boolean duplicates; 	// are duplicated digits in a code allowed
 	
 	private int current_move=1;		// index for moves, if it reaches max_moves player loses
+	private int current_element=0;
+	private int[] current_code;
 	private int[] correct_code;		// array that holds the digits of a correct code
 	
 	private Timer t1;
+	
+	private boolean is_over;
+	
+	public void Initialize()
+	{
+		t1 = new Timer();
+    	t1.start();
+
+		Create_code();
+    	
+    	Menu.game_exit.setOnAction(e -> 		//exit button
+		{
+			for(int i=0;i<(max_moves*code_length);i++)
+			{
+				Menu.game_answers[i].setStyle("-fx-background-color: lightgray");
+				Menu.game_results[i].setVisible(false);
+			}
+			for(int i=0; i<code_length;i++)
+    		{
+    			Menu.game_correct[i].setStyle("-fx-background-color: gray");
+    			Menu.game_correct[i].setText("?");
+    		}
+			Menu.game_over.setVisible(false);
+			Menu.window.setScene(Menu.main_scene);
+			if(t1!=null)
+			{
+				t1.Terminate();
+			}
+		});
+    	
+    	Menu.game_again.setOnAction(e ->
+    	{
+    		is_over=false;
+    		for(int i=0;i<(max_moves*code_length);i++)
+			{
+    			Menu.game_answers[i].setStyle("-fx-background-color: lightgray");
+    			Menu.game_results[i].setVisible(false);
+			}
+    		for(int i=0; i<code_length;i++)
+    		{
+    			current_code[i]=0;
+    			Menu.game_correct[i].setStyle("-fx-background-color: gray");
+    			Menu.game_correct[i].setText("?");
+    		}
+    		current_move=1;
+    		current_element=0;
+    		Create_code();
+    		Menu.game_over.setVisible(false);
+    		if(t1!=null)
+    		{
+    			t1.Start_again();
+    		}
+    		
+    	});
+    	Menu.game_cancel.setOnAction(e ->
+    	{
+    		if(current_element>0 && (current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
+    		{
+    			current_element--;
+    			current_code[current_element]=0;
+    			Menu.game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:lightgrey");
+    		}
+    	});
+    	
+    	Menu.game_choices[0].setOnAction(e ->
+    	{
+    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
+    		{
+    			current_code[current_element]=1;
+    			Menu.game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:red");
+	    		if(Is_finished()) Play();
+	    		else current_element++;
+    		}
+    	});
+    	Menu.game_choices[1].setOnAction(e ->
+    	{
+    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
+    		{
+    			current_code[current_element]=2;
+    			Menu.game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:royalblue");
+	    		if(Is_finished()) Play();
+	    		else current_element++;
+    		}
+    		
+    	});
+    	Menu.game_choices[2].setOnAction(e ->
+    	{
+    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
+    		{
+    			current_code[current_element]=3;
+    			Menu.game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:lime");
+	    		if(Is_finished()) Play();
+	    		else current_element++;
+    		}
+    	});
+    	Menu.game_choices[3].setOnAction(e ->
+    	{
+    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
+    		{
+    			current_code[current_element]=4;
+    			Menu.game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:gold");
+	    		if(Is_finished()) Play();
+	    		else current_element++;
+    		}
+    	});
+    	Menu.game_choices[4].setOnAction(e ->
+    	{
+    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
+    		{
+    			current_code[current_element]=5;
+    			Menu.game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:blueviolet");
+	    		if(Is_finished()) Play();
+	    		else current_element++;
+    		}
+    	});
+    	Menu.game_choices[5].setOnAction(e ->
+    	{
+    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
+    		{
+    			current_code[current_element]=6;
+    			Menu.game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:black");
+	    		if(Is_finished()) Play();
+	    		else current_element++;
+    		}
+    	});
+    	Menu.game_choices[6].setOnAction(e ->
+    	{
+    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
+    		{
+    			current_code[current_element]=7;
+    			Menu.game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color:darkgreen");
+	    		if(Is_finished()) Play();
+	    		else current_element++;
+    		}
+    	});
+    	Menu.game_choices[7].setOnAction(e ->
+    	{
+    		if((current_move-1)*code_length+current_element < max_moves*code_length && !is_over)
+    		{
+    			current_code[current_element]=8;
+    			Menu.game_answers[(current_move-1)*code_length+current_element].setStyle("-fx-background-color: sienna");
+	    		if(Is_finished()) Play();
+	    		else current_element++;
+    		}
+    	});
+		
+	}
 	
 	public Mastermind(int code_length, int max_moves, int max_number, boolean duplicates) {
 		this.code_length=code_length;
@@ -24,12 +177,18 @@ public class Mastermind {
 		this.max_number=max_number;
 		this.duplicates=duplicates;
 		correct_code=new int[code_length];
-		
-		t1 = new Timer();
-    	t1.start();
-		
-		Create_code();
-		Play();
+		current_code=new int[code_length];
+		is_over=false;
+	}
+	
+	
+	public boolean Is_finished()
+	{
+		for(int i=0;i<code_length;i++)
+		{
+			if(current_code[i]==0) return false; 
+		}
+		return true;
 	}
 	
 	public void Create_code()		// generate the correct code by random
@@ -47,75 +206,69 @@ public class Mastermind {
 	
 	public void Play()		// main method, where the player makes his moves
 	{
-		System.out.println("\nI have generated a " + code_length +" digits long code, consisting of numbers from 1 to " + max_number +".");
-		if(duplicates) System.out.println("Duplicates are allowed.");
-		else System.out.println("Duplicates are not allowed.");
-		System.out.println("You have " + max_moves +" moves to break the code. Good luck.");
-		
-		Scanner input=new Scanner(System.in);
-		
-		while(current_move<=max_moves)		// main loop, where the game takes place
+		if(Is_won())				// if the code is fully correct, the game is won
 		{
-			System.out.print("\nMove #" + current_move + ": ");
-			String move=input.nextLine();
-			while(!Is_correct(move))		// if the move is incorrect, the player has to type it again
-			{
-				System.out.println("Error. Incorrect move");
-				move=input.nextLine();
-			}
-			if(Is_won(move))				// if the code is fully correct, the game is won
-			{
-				Game_won();
-				break;
-			}
-			else
-			{
-				Check_move(move);			// compare the player code to the winning code
-				current_move++;
-			}
+			Game_over(true);
 		}
-		if(current_move>max_moves)	Game_lost();		// if the player used all his moves and didn't guess the code, the game is lost
+		else
+		{
+			Check_move();			// compare the player code to the winning code
+			current_move++;
+		}
+		if(current_move>max_moves)	Game_over(false);		// if the player used all his moves and didn't guess the code, the game is lost
+		current_element=0;
+		for(int i=0;i<code_length;i++)
+		{
+			current_code[i]=0;
+		}
+		
 	}
 	
-	public boolean Is_correct(String move) // checks if the code that player typed is correct
+	public void Check_move() // this method returns the amount of perfect digits (in the right place) and wrongly placed digits (they are in code, but in different place)
 	{
-		if(move.length()!=code_length) return false; // the winning code, and player typed code have to be equal in length
-		for(int i=0;i<move.length();i++)			 // digits in the code have to be between 1 and max_number
+		int[] support_dub = new int[code_length];
+		for(int i=0;i<code_length;i++)		//0-nothing, 1-wrong place, 2-perfect
 		{
-			if(Character.getNumericValue(move.charAt(i))<1 || Character.getNumericValue(move.charAt(i))>max_number)
-			{
-				return false;
-			}
+			support_dub[i]=0;
 		}
-		return true;
-	}
-	
-	public void Check_move(String move) // this method returns the amount of perfect digits (in the right place) and wrongly placed digits (they are in code, but in different place)
-	{
 		int perfect=0;
 		int wrong_place=0;
-		for(int i=0;i<move.length();i++)
+		for(int i=0;i<code_length;i++)
 		{
-			if(!Check_duplicates_move(move,i))
+			boolean dup=Check_duplicates_move(i);
+			for(int j=0;j<code_length;j++)
 			{
-				for(int j=0;j<code_length;j++)
+				if(current_code[i] == correct_code[j])
 				{
-					if(Character.getNumericValue(move.charAt(i)) == correct_code[j])
+					if(i==j && !dup)
 					{
-						if(i==j) perfect++;
-						else wrong_place++;
+						perfect++;
+						support_dub[i]=2;
+					}
+					else if(i==j && dup)
+					{
+						perfect++;
+						support_dub[i]=2;
+						wrong_place--;
+					}
+					
+					else if(!dup)
+					{
+						wrong_place++;
+						support_dub[i]=1;
 					}
 				}
 			}
 		}
-		System.out.println("Perfect: " + perfect + " Wrong place: " + wrong_place);
+		Results_move(perfect,wrong_place);
 	}
 	
-	public boolean Check_duplicates_move(String move, int l)   // this method supplements the Check_move(String move) method so that it gives the correct answers
+	public boolean Check_duplicates_move(int l)   // this method supplements the Check_move(String move) method so that it gives the correct answers
 	{
+		if(duplicates) return false;
 		for(int i=0;i<l;i++)
 		{
-			if(move.charAt(i) == move.charAt(l))
+			if(current_code[i]==current_code[l])
 			{
 				return true;
 			}
@@ -123,11 +276,35 @@ public class Mastermind {
 		return false;
 	}
 	
-	public boolean Is_won(String move)	//simple method, that checks if the code typed by the player equals winning code
+	public void Results_move(int perfect, int wrong_place)
 	{
 		for(int i=0;i<code_length;i++)
 		{
-			if(correct_code[i]!=Character.getNumericValue(move.charAt(i)))
+			if(perfect>0)
+			{
+				Menu.game_results[i+(current_move-1)*code_length].setStyle("-fx-background-color:red");
+				Menu.game_results[i+(current_move-1)*code_length].setVisible(true);
+				perfect--;
+			}
+			else if(wrong_place>0)
+			{
+				Menu.game_results[i+(current_move-1)*code_length].setStyle("-fx-background-color:gold");
+				Menu.game_results[i+(current_move-1)*code_length].setVisible(true);
+				wrong_place--;
+			}
+			else	
+			{
+				Menu.game_results[i+(current_move-1)*code_length].setStyle("-fx-background-color:lightgray");
+				Menu.game_results[i+(current_move-1)*code_length].setVisible(true);
+			}
+		}
+	}
+	
+	public boolean Is_won()	//simple method, that checks if the code typed by the player equals winning code
+	{
+		for(int i=0;i<code_length;i++)
+		{
+			if(current_code[i]!=correct_code[i])
 			{
 				return false;
 			}
@@ -135,27 +312,71 @@ public class Mastermind {
 		return true;
 	}
 	
-	public void Game_won()		// game results
-	{
-		System.out.println("\nCongratulations! You have won in " + current_move + " moves. The code was: " + Correct_code_to_string());
-		t1.Display_time();
-	}
 	
-	public void Game_lost()		// game results
+	public void Game_over(boolean win)
 	{
-		System.out.println("\nYou lost, correct code was: " + Correct_code_to_string());
-		t1.Display_time();
-	}
-	
-	public String Correct_code_to_string() // change code from array of ints to string
-	{
-		String code="";
+		is_over=true;
+		Menu.game_over.setVisible(true);
+		if(t1!=null)
+		{
+			t1.Terminate();
+		}
+		
 		for(int i=0;i<code_length;i++)
 		{
-			code+=Integer.toString(correct_code[i]);
+			Menu.game_correct[i].setText("");
+			if(correct_code[i]==1)	Menu.game_correct[i].setStyle("-fx-background-color:red");
+			else if(correct_code[i]==2)	Menu.game_correct[i].setStyle("-fx-background-color:royalblue");
+			else if(correct_code[i]==3)	Menu.game_correct[i].setStyle("-fx-background-color:lime");
+			else if(correct_code[i]==4)	Menu.game_correct[i].setStyle("-fx-background-color:gold");
+			else if(correct_code[i]==5)	Menu.game_correct[i].setStyle("-fx-background-color:blueviolet");
+			else if(correct_code[i]==6)	Menu.game_correct[i].setStyle("-fx-background-color:black");
+			else if(correct_code[i]==7)	Menu.game_correct[i].setStyle("-fx-background-color:darkgreen");
+			else if(correct_code[i]==8)	Menu.game_correct[i].setStyle("-fx-background-color:sienna");
 		}
-		return code;
+		
+		for(int i=0;i<max_moves*code_length;i++)
+		{
+			Menu.game_results[i].setVisible(false);
+		}
+		
+		
+		Stage game_over_stage = new Stage();
+		game_over_stage.setWidth(200);
+		game_over_stage.setHeight(200);
+		game_over_stage.setResizable(false);
+		
+		Label game_over_label = new Label();
+		game_over_label.setFont(new Font(15.0));
+		Button game_over_button = new Button("Close");
+		game_over_button.setFont(new Font(15.0));
+		game_over_button.setOnAction(e -> game_over_stage.close());
+		VBox game_over_layout = new VBox(10);
+		game_over_layout.getChildren().addAll(game_over_label,game_over_button);
+		Scene game_over_scene = new Scene(game_over_layout);
+		game_over_stage.setScene(game_over_scene);
+		game_over_stage.show();
+		game_over_layout.setStyle("-fx-padding: 10;" + 
+                "-fx-border-style: solid inside;" + 
+                "-fx-border-width: 2;" +
+                "-fx-border-insets: 5;" + 
+                "-fx-border-radius: 5;" + 
+                "-fx-border-color: black;");
+		
+		if(win)
+		{
+			Results_move(4,0);
+			game_over_label.setText("You won!\nMoves: " + (current_move) + "/" +max_moves +"\n" + t1.Display_time());
+			Menu.game_over.setText("You won!");
+		}
+		else
+		{
+			game_over_label.setText("You lost!\nMoves: " + (current_move-1) + "/" +max_moves +"\n" + t1.Display_time());
+			Menu.game_over.setText("You lost!");
+		}
 	}
+	
+
 	
 	public boolean Check_duplicates(int number, int l) // used if dupplicates are not allowed
 	{
